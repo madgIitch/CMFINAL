@@ -60,6 +60,7 @@ public class ChatActivity extends AppCompatActivity {
         initViews();
         setupChatRecyclerView();
         fetchAndDisplayProfilePicture();
+        getOrCreateChatroomModel();
     }
 
     private void initViews() {
@@ -76,11 +77,13 @@ public class ChatActivity extends AppCompatActivity {
         sendMessageBtn.setOnClickListener(v -> {
             String message = messageInput.getText().toString().trim();
             if (!message.isEmpty()) {
-                sendMessageToUser(message);
+                if (chatroomModel != null) {
+                    sendMessageToUser(message);
+                } else {
+                    Log.e("ChatActivity", "ChatroomModel is null, cannot send message.");
+                }
             }
         });
-
-        getOrCreateChatroomModel();
     }
 
     private void fetchAndDisplayProfilePicture() {
@@ -114,7 +117,6 @@ public class ChatActivity extends AppCompatActivity {
         adapter.startListening();
     }
 
-
     void getOrCreateChatroomModel() {
         FirebaseUtil.getChatroomReference(chatroomId).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -128,6 +130,11 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     void sendMessageToUser(String message) {
+        if (chatroomModel == null) {
+            Log.e("ChatActivity", "Cannot send message, ChatroomModel is null.");
+            return;
+        }
+
         chatroomModel.setLastMessageTimestamp(Timestamp.now());
         chatroomModel.setLastMessageSenderId(FirebaseUtil.currentUserId());
         chatroomModel.setLastMessage(message);
@@ -193,5 +200,37 @@ public class ChatActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (adapter != null) {
+            adapter.startListening();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (adapter != null) {
+            adapter.stopListening();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (adapter != null) {
+            adapter.startListening();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (adapter != null) {
+            adapter.stopListening();
+        }
     }
 }
