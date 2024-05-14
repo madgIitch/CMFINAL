@@ -19,7 +19,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.myapplication.model.UserModel;
 import com.example.myapplication.utils.AndroidUtil;
@@ -31,12 +30,13 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.UploadTask;
 
 import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 import android.app.Activity;
 
 public class ProfileFragment extends Fragment {
 
     private ImageView profilePic;
-    private EditText usernameInput, emailInput;
+    private EditText usernameInput, emailInput, nowUserInput;  // Add nowUserInput
     private Button updateProfileBtn;
     private ProgressBar progressBar;
     private TextView logoutBtn;
@@ -55,9 +55,9 @@ public class ProfileFragment extends Fragment {
 
         imagePickLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
+                    if(result.getResultCode() == Activity.RESULT_OK){
                         Intent data = result.getData();
-                        if (data != null && data.getData() != null) {
+                        if(data != null && data.getData() != null){
                             selectImageUri = data.getData();
                             AndroidUtil.setProfilePic(getContext(), selectImageUri, profilePic);
                         }
@@ -72,6 +72,7 @@ public class ProfileFragment extends Fragment {
         profilePic = view.findViewById(R.id.profile_image_view);
         usernameInput = view.findViewById(R.id.profile_username);
         emailInput = view.findViewById(R.id.profile_email);
+        nowUserInput = view.findViewById(R.id.profile_now_user);  // Initialize nowUserInput
         updateProfileBtn = view.findViewById(R.id.profile_update_btn);
         progressBar = view.findViewById(R.id.profile_progressbar);
         logoutBtn = view.findViewById(R.id.logout_btn);
@@ -100,24 +101,32 @@ public class ProfileFragment extends Fragment {
     }
 
     private void updateBtnClick() {
-        if (currentUserModel == null) {
-            Toast.makeText(getContext(), "Error al cargar los datos del usuario. Inténtalo de nuevo.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
         String newUsername = usernameInput.getText().toString().trim();
+        String newNowUser = nowUserInput.getText().toString().trim();  // Get nowUser value
+
         if (newUsername.isEmpty() || newUsername.length() < 3) {
             usernameInput.setError("El nombre de usuario debe tener más de 3 caracteres");
             return;
         }
-        currentUserModel.setUsername(newUsername);
-        setInProgress(true);
 
-        if (selectImageUri != null) {
-            FirebaseUtil.getCurrentProfilePicStorageRef().putFile(selectImageUri).addOnCompleteListener(task -> updateToFirestore());
-        } else {
-            updateToFirestore();
-        }
+        // Check if the username is already in use
+        FirebaseUtil.allUserCollectionReference().whereEqualTo("username", newUsername).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                usernameInput.setError("El nombre de usuario ya está en uso");
+            } else {
+                currentUserModel.setUsername(newUsername);
+                currentUserModel.setNowUser(newNowUser);  // Set nowUser value
+                setInProgress(true);
+
+                if (selectImageUri != null) {
+                    FirebaseUtil.getCurrentProfilePicStorageRef().putFile(selectImageUri).addOnCompleteListener(task1 -> {
+                        updateToFirestore();
+                    });
+                } else {
+                    updateToFirestore();
+                }
+            }
+        });
     }
 
     private void logoutUser() {
@@ -132,11 +141,6 @@ public class ProfileFragment extends Fragment {
     }
 
     private void updateToFirestore() {
-        if (currentUserModel == null) {
-            Toast.makeText(getContext(), "Error al cargar los datos del usuario. Inténtalo de nuevo.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
         FirebaseUtil.currentUserDetails().set(currentUserModel).addOnCompleteListener(task -> {
             setInProgress(false);
             if (task.isSuccessful()) {
@@ -154,9 +158,6 @@ public class ProfileFragment extends Fragment {
             if (task.isSuccessful()) {
                 Uri uri = task.getResult();
                 AndroidUtil.setProfilePic(getContext(), uri, profilePic);
-            } else {
-                // Handle the error when the file does not exist
-                AndroidUtil.showToast(getContext(), "No se encontró la imagen de perfil.");
             }
         });
 
@@ -167,11 +168,8 @@ public class ProfileFragment extends Fragment {
                 if (currentUserModel != null) {
                     usernameInput.setText(currentUserModel.getUsername());
                     emailInput.setText(currentUserModel.getEmail());
-                } else {
-                    Toast.makeText(getContext(), "Error al cargar los datos del usuario. Inténtalo de nuevo.", Toast.LENGTH_SHORT).show();
+                    nowUserInput.setText(currentUserModel.getNowUser());  // Set nowUser value
                 }
-            } else {
-                Toast.makeText(getContext(), "Error al cargar los datos del usuario. Inténtalo de nuevo.", Toast.LENGTH_SHORT).show();
             }
         });
     }

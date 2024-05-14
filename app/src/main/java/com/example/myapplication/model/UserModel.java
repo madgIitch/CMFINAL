@@ -6,6 +6,7 @@ public class UserModel {
     private String userId;
     private String email;
     private String username;
+    private String nowUser;  // New field
     private String fcmToken;
     private Timestamp createdTimestamp;
 
@@ -14,13 +15,18 @@ public class UserModel {
     }
 
     public UserModel(String userId, String email, String username, Timestamp createdTimestamp) {
-        this(userId, email, username, null, createdTimestamp);  // Delegate to the full constructor
+        this(userId, email, username, null, createdTimestamp);
     }
 
     public UserModel(String userId, String email, String username, String fcmToken, Timestamp createdTimestamp) {
+        this(userId, email, username, null, fcmToken, createdTimestamp);
+    }
+
+    public UserModel(String userId, String email, String username, String nowUser, String fcmToken, Timestamp createdTimestamp) {
         this.userId = userId;
         this.email = email;
         this.username = username;
+        this.nowUser = nowUser;
         this.fcmToken = fcmToken;
         this.createdTimestamp = createdTimestamp;
     }
@@ -48,6 +54,14 @@ public class UserModel {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getNowUser() {
+        return nowUser;
+    }
+
+    public void setNowUser(String nowUser) {
+        this.nowUser = nowUser;
     }
 
     public String getFcmToken() {

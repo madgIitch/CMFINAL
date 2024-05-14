@@ -4,7 +4,8 @@
     android:layout_height="wrap_content"
     android:background="@drawable/edit_text_rounded_corner"
     android:layout_margin="10dp"
-    android:elevation="2dp">
+    android:elevation="2dp"
+    android:orientation="horizontal">
 
     <include layout="@layout/profile_pic_view"
         android:id="@+id/profile_pic_recycled_view"/>
@@ -13,7 +14,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center">
+        android:gravity="center"
+        android:layout_marginStart="10dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -26,8 +28,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="email@example.com"
-            android:id="@+id/user_email"/>
+            android:text="nowUser"
+            android:id="@+id/user_now_user"/> <!-- ID updated for nowUser -->
 
     </LinearLayout>
 

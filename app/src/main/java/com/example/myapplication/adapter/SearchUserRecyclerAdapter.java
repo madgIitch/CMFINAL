@@ -32,7 +32,7 @@ public class SearchUserRecyclerAdapter extends FirestoreRecyclerAdapter<UserMode
     @Override
     protected void onBindViewHolder(@NonNull UserModelViewHolder holder, int position, @NonNull UserModel userModel) {
         holder.usernameTextView.setText(userModel.getUsername());
-        holder.userEmailTextView.setText(userModel.getEmail());
+        holder.nowUserTextView.setText(userModel.getNowUser());
         if (userModel.getUserId().equals(FirebaseUtil.currentUserId())) {
             holder.usernameTextView.setText(userModel.getUsername() + " (Tú)");
         }
@@ -62,14 +62,14 @@ public class SearchUserRecyclerAdapter extends FirestoreRecyclerAdapter<UserMode
     class UserModelViewHolder extends RecyclerView.ViewHolder {
 
         TextView usernameTextView;
-        TextView userEmailTextView;
+        TextView nowUserTextView;
         ImageView profilePic;
 
         public UserModelViewHolder(@NonNull View itemView) {
             super(itemView);
             profilePic = itemView.findViewById(R.id.profile_pic_imageView); // Asegúrate que este ID está presente en profile_pic_view.xml
             usernameTextView = itemView.findViewById(R.id.user_name_text);
-            userEmailTextView = itemView.findViewById(R.id.user_email); // El nuevo ID para el email
+            nowUserTextView = itemView.findViewById(R.id.user_now_user); // El nuevo ID para nowUser
         }
     }
 }
