@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -12,7 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.myapplication.model.UserModel;
-import com.example.myapplication.utils.FirebaseUtil;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
@@ -26,6 +26,7 @@ public class LoginActivity extends AppCompatActivity {
     EditText emailInput, passwordInput;
     Button loginBtn, registerBtn;
     ProgressBar progressBar;
+    ImageView mascotaImage;
     FirebaseAuth auth;
 
     @Override
@@ -38,6 +39,7 @@ public class LoginActivity extends AppCompatActivity {
         loginBtn = findViewById(R.id.login);
         registerBtn = findViewById(R.id.register);
         progressBar = findViewById(R.id.progressBar);
+        mascotaImage = findViewById(R.id.mascota_image); // Add this line
         auth = FirebaseAuth.getInstance();
 
         loginBtn.setOnClickListener(new View.OnClickListener() {
@@ -94,6 +96,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     checkUserExistsInFirestore();
                 } else {
+                    mascotaImage.setImageResource(R.drawable.mascota_triste); // Add this line
                     Toast.makeText(LoginActivity.this, "Authentication failed. Check your email and password.", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -109,6 +112,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     saveUserToFirestore(email);
                 } else {
+                    mascotaImage.setImageResource(R.drawable.mascota_triste); // Add this line
                     Toast.makeText(LoginActivity.this, "Registration failed. Try again later.", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -131,6 +135,7 @@ public class LoginActivity extends AppCompatActivity {
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
                         } else {
+                            mascotaImage.setImageResource(R.drawable.mascota_triste); // Add this line
                             Toast.makeText(LoginActivity.this, "Failed to save user data. Try again later.", Toast.LENGTH_SHORT).show();
                         }
                     }
