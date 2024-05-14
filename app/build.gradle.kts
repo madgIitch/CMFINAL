@@ -43,13 +43,11 @@ dependencies {
     implementation("com.google.firebase:firebase-messaging") // Version managed by BOM
     implementation ("com.google.firebase:firebase-appcheck-safetynet:16.0.0")
 
-
     // Other dependencies
     implementation("com.hbb20:ccp:2.5.0")
     implementation("com.github.dhaval2404:imagepicker:2.1")
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
-
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

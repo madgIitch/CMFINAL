@@ -17,20 +17,29 @@ import com.example.myapplication.R;
 import com.example.myapplication.model.UserModel;
 import com.example.myapplication.utils.AndroidUtil;
 import com.example.myapplication.utils.FirebaseUtil;
-import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
-import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 
-public class SearchUserRecyclerAdapter extends FirestoreRecyclerAdapter<UserModel, SearchUserRecyclerAdapter.UserModelViewHolder> {
+import java.util.ArrayList;
+import java.util.List;
+
+public class CustomSearchUserRecyclerAdapter extends RecyclerView.Adapter<CustomSearchUserRecyclerAdapter.UserModelViewHolder> {
 
     private Context context;
+    private List<UserModel> userList = new ArrayList<>();
 
-    public SearchUserRecyclerAdapter(@NonNull FirestoreRecyclerOptions<UserModel> options, Context context) {
-        super(options);
+    public CustomSearchUserRecyclerAdapter(Context context) {
         this.context = context;
     }
 
+    @NonNull
     @Override
-    protected void onBindViewHolder(@NonNull UserModelViewHolder holder, int position, @NonNull UserModel userModel) {
+    public UserModelViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.search_user_recycler_row, parent, false);
+        return new UserModelViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull UserModelViewHolder holder, int position) {
+        UserModel userModel = userList.get(position);
         holder.usernameTextView.setText(userModel.getUsername());
         holder.nowUserTextView.setText(userModel.getNowUser());
         if (userModel.getUserId().equals(FirebaseUtil.currentUserId())) {
@@ -52,14 +61,17 @@ public class SearchUserRecyclerAdapter extends FirestoreRecyclerAdapter<UserMode
         });
     }
 
-    @NonNull
     @Override
-    public UserModelViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.search_user_recycler_row, parent, false);
-        return new UserModelViewHolder(view);
+    public int getItemCount() {
+        return userList.size();
     }
 
-    class UserModelViewHolder extends RecyclerView.ViewHolder {
+    public void setUserList(List<UserModel> userList) {
+        this.userList = userList;
+        notifyDataSetChanged();
+    }
+
+    static class UserModelViewHolder extends RecyclerView.ViewHolder {
 
         TextView usernameTextView;
         TextView nowUserTextView;
